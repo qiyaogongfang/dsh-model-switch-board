@@ -1,4 +1,4 @@
-# 模型切换看板（dsh-task-router）
+# 模型切换看板（dsh-model-switch-board）
 
 > **半成品 / Work in progress** —— 能跑，但接口、配置和界面都会变。
 
@@ -38,8 +38,6 @@ git clone https://github.com/qiyaogongfang/dsh-model-switch-board.git
 ```
 
 在 DSH 桌面版里把目录作为本地插件安装（插件管理里选本地目录），或把目录以 `link:` 方式加进 profile，然后重载插件、刷新页面。
-
-> 半成品说明：包名暂时沿用本地开发时的 `@local/task-router`，是为了和现有 profile 的 link 保持一致；正式发布时会换成公开包名。
 
 ## 工具
 
@@ -89,7 +87,7 @@ git clone https://github.com/qiyaogongfang/dsh-model-switch-board.git
 ```yaml
 - insert:
     - id: task-router
-      name: '@local/task-router'
+      name: 'dsh-model-switch-board'
       config:
         summaryChars: 800
         tiers:

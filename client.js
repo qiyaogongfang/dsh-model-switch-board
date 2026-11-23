@@ -4,7 +4,7 @@
 //   每个对话用了哪些模型（API / 本机）、各多少轮、多少 token，以及里面提交过哪些后台任务。
 // 数据来自 Host 的 GET /tr/api/dashboard。
 window.__ModuleLoader__.load({
-  id: '@local/task-router',
+  id: 'dsh-model-switch-board',
   factory(require) {
     const React = require('react')
     const h = React.createElement

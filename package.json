@@ -1,12 +1,19 @@
 {
-  "name": "@local/task-router",
+  "name": "dsh-model-switch-board",
   "version": "0.2.1",
-  "description": "把简单/中等的文本任务交给本机模型或免费池，后台跑完再取摘要，主对话不背原文。/ Route plain text work to local or free models in the background.",
+  "description": "DSH 实验性插件：把任务按复杂/一般/简单路由到不同模型，并在侧栏查看每个对话的模型参与情况（半成品）。",
   "type": "module",
   "main": "index.js",
-  "private": true,
   "license": "MIT",
-  "keywords": ["dsh", "dsh-plugin", "deepseek-harness", "task-router", "background", "local-llm"],
+  "keywords": ["dsh", "dsh-plugin", "deepseek-harness", "llm-router", "ollama", "dashboard"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qiyaogongfang/dsh-model-switch-board.git"
+  },
+  "homepage": "https://github.com/qiyaogongfang/dsh-model-switch-board#readme",
+  "bugs": {
+    "url": "https://github.com/qiyaogongfang/dsh-model-switch-board/issues"
+  },
   "engines": {
     "dsh": ">=0.2.2-rc.1"
   },
