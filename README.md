@@ -17,7 +17,7 @@ Try it out and feel free to report issues, but please do not use it in productio
 DSH（DeepSeek Harness）的一个本地插件，做两件事：
 
 1. **后台任务路由**：把机械的文本/编码活按「简单 / 一般 / 复杂」分给不同模型，后台跑完只回摘要，主对话不背原文；
-2. **模型切换看板**：侧栏面板里按对话列出模型参与情况（哪几轮是谁跑的、API 还是本机）、token 和后台任务，并允许直接给三层换模型。
+2. **模型切换看板**：侧栏面板里按对话列出每个模型用了多少轮、多少 token（API 还是本机）、后台任务，并允许直接给三层换模型。
 
 ## 分层
 
