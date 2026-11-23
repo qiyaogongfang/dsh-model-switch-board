@@ -490,6 +490,48 @@ async function scanSession(sp, id, ctx) {
   }
 }
 
+/** 把后台任务的后端合并进「每个模型的 token 消耗」，本地 ollama 任务也会出现在表里。 */
+function mergeJobModels(models, jobs) {
+  const map = new Map((models || []).map((model) => [`${model.provider}/${model.model}`, { ...model }]))
+  for (const job of jobs || []) {
+    if (!job || !job.backend) continue
+    if (!['done', 'running', 'completed'].includes(job.status)) continue
+    const raw = String(job.backend).trim()
+    let provider = 'job'
+    let model = raw
+    if (/^本机\s+/.test(raw)) {
+      provider = 'ollama'
+      model = raw.replace(/^本机\s+/, '')
+    } else if (/^免费池\s+/.test(raw)) {
+      const text = raw.replace(/^免费池\s+/, '')
+      const slash = text.indexOf('/')
+      provider = slash > 0 ? text.slice(0, slash) : 'free'
+      model = slash > 0 ? text.slice(slash + 1) : text
+    } else {
+      const slash = raw.indexOf('/')
+      provider = slash > 0 ? raw.slice(0, slash) : 'job'
+      model = slash > 0 ? raw.slice(slash + 1) : raw
+    }
+    model = model.replace(/:latest$/, '')
+    const key = `${provider}/${model}`
+    const row = map.get(key) || {
+      provider,
+      model,
+      local: isLocalModel(provider, model) || !job.api,
+      turns: 0,
+      input: 0,
+      output: 0,
+      jobs: 0,
+    }
+    row.turns += 1
+    row.jobs = (row.jobs || 0) + 1
+    row.input += Number(job.input) || 0
+    row.output += Number(job.output) || 0
+    map.set(key, row)
+  }
+  return [...map.values()]
+}
+
 const TIER_NAMES = { deep: '复杂', standard: '一般', cheap: '简单' }
 
 function backendFromPatch(patch) {
@@ -755,6 +797,10 @@ function createDashboard(ctx, router, configState = {}) {
         cached?.stats && (session.live || cached.revision === session.revision) ? cached.stats : null
       const jobIds = new Set([...(cached?.stats?.jobIds || []), ...(jobsBySession.get(session.id) || []).map((job) => job.id)])
       const jobs = [...jobIds].map((id) => router.jobs.get(id)).filter(Boolean).map(publicJob)
+      const mergedModels = stats ? mergeJobModels(stats.models, jobs) : null
+      const mergedTurns = mergedModels ? mergedModels.reduce((sum, row) => sum + row.turns, 0) : 0
+      const mergedInput = mergedModels ? mergedModels.reduce((sum, row) => sum + row.input, 0) : 0
+      const mergedOutput = mergedModels ? mergedModels.reduce((sum, row) => sum + row.output, 0) : 0
       return {
         id: session.id,
         live: Boolean(session.live),
@@ -764,10 +810,10 @@ function createDashboard(ctx, router, configState = {}) {
         preview: (stats || cached?.stats)?.preview || '',
         stats: stats
           ? {
-              models: stats.models,
-              turns: stats.turns,
-              input: stats.input,
-              output: stats.output,
+              models: mergedModels,
+              turns: mergedTurns,
+              input: mergedInput,
+              output: mergedOutput,
               timeline: stats.timeline || [],
               timelineTruncated: Boolean(stats.timelineTruncated),
             }

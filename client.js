@@ -182,7 +182,7 @@ window.__ModuleLoader__.load({
               h('tbody', null,
                 [...item.stats.models].sort((a, b) => (b.input + b.output) - (a.input + a.output)).map((model) => h('tr', { key: `${model.provider}/${model.model}` },
                   h('td', null, `${model.provider}/${model.model}`),
-                  h('td', null, model.local ? '本机' : 'API'),
+                  h('td', null, `${model.local ? '本机' : 'API'}${model.jobs ? ` · 后台${model.jobs}` : ''}`),
                   h('td', { className: 'num' }, fmt(model.turns)),
                   h('td', { className: 'num' }, fmt(model.input)),
                   h('td', { className: 'num' }, fmt(model.output)),
