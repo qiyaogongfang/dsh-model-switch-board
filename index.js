@@ -795,7 +795,7 @@ function createDashboard(ctx, router, configState = {}) {
       // 正在跑写的会话不读日志（会和写句柄抢锁），只展示上一次缓存的统计。
       const stats =
         cached?.stats && (session.live || cached.revision === session.revision) ? cached.stats : null
-      const jobIds = new Set([...(cached?.stats?.jobIds || []), ...(jobsBySession.get(session.id) || []).map((job) => job.id)])
+      const jobIds = new Set((jobsBySession.get(session.id) || []).map((job) => job.id))
       const jobs = [...jobIds].map((id) => router.jobs.get(id)).filter(Boolean).map(publicJob)
       const mergedModels = stats ? mergeJobModels(stats.models, jobs) : null
       const mergedTurns = mergedModels ? mergedModels.reduce((sum, row) => sum + row.turns, 0) : 0

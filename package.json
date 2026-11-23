@@ -1,6 +1,6 @@
 {
   "name": "dsh-model-switch-board",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "DSH 插件：按复杂/一般/简单把任务路由到不同模型，并在看板里查看每个对话的模型与 token 消耗。",
   "type": "module",
   "main": "index.js",

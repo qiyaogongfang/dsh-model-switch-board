@@ -194,7 +194,10 @@ window.__ModuleLoader__.load({
                   h('td', { className: 'num' }, fmt(item.stats.input)),
                   h('td', { className: 'num' }, fmt(item.stats.output)),
                   h('td', { className: 'num' }, fmt(item.stats.input + item.stats.output)))))
-            : h('div', { className: 'tr-empty' }, item.stats ? '这个对话没有模型回调记录' : '正在读取会话日志…')),
+            : h('div', { className: 'tr-empty' }, item.stats ? '这个对话没有模型回调记录' : '正在读取会话日志…'),
+          item.stats && item.stats.models.some((model) => model.jobs)
+            ? h('div', { className: 'tr-hint' }, '本机 / 后台行只统计该对话自己提交的后台任务；没提交过就不会出现。')
+            : null),
 
         h('div', null,
           h('div', { className: 'tr-block-title' }, `后台任务（${jobs.length}）`),
