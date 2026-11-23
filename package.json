@@ -1,7 +1,7 @@
 {
   "name": "dsh-model-switch-board",
-  "version": "0.2.1",
-  "description": "DSH 实验性插件：把任务按复杂/一般/简单路由到不同模型，并在侧栏查看每个对话的模型参与情况（半成品）。",
+  "version": "0.2.2",
+  "description": "DSH 实验性插件：把任务按复杂/一�?简单路由到不同模型，并在侧栏查看每个对话的模型参与情况（半成品）�?,
   "type": "module",
   "main": "index.js",
   "license": "MIT",

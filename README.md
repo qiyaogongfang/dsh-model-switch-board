@@ -57,7 +57,7 @@ git clone https://github.com/qiyaogongfang/dsh-model-switch-board.git
 - **模型设置**：面板顶部「模型设置」里，分别给复杂 / 一般 / 简单选提供方和模型（复杂可以选「留在主对话」）。保存后写到 `data/models.json`，重启也生效，新提交的任务按新配置走。
 - 数据来源：DSH 会话日志（`ctx.sessionPersistence`）+ 插件自己的任务记录；本机模型按 Ollama 提供方识别。
 - 首次打开要扫一遍会话，30 个大约几秒；扫完写进 `data/dashboard-cache.json`，之后按 revision 增量刷新。
-- 正在写的当前对话不读日志（会和写句柄抢锁），显示上一次缓存的统计，标记「实时对话」。
+- 正在写的当前对话直接从内存读事件，每次轮询（4 秒）更新；已结束的对话读持久化日志。
 - 看板每 4 秒自动刷新；「刷新」按钮强制重扫。
 
 ## 数据

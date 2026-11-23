@@ -398,11 +398,18 @@ function textOfContent(content) {
 /** 读一个会话的事件，算出每个模型用了多少轮、多少 token，以及里面提交过哪些后台任务。 */
 async function scanSession(sp, id, ctx) {
   let events = []
+  let liveSeq
 
   // 正在运行的会话直接读内存，避免和写句柄抢锁；落盘的才走持久化读取。
   const live = ctx.get('sessions')?.get?.(id)
-  if (live && typeof live.snapshotEvents === 'function') {
-    events = live.snapshotEvents() || []
+  if (live) {
+    liveSeq = typeof live.seq === 'number' ? live.seq : undefined
+    if (typeof live.snapshotEvents !== 'function') throw new Error('运行中会话没有 snapshotEvents，无法读取')
+    try {
+      events = live.snapshotEvents() || []
+    } catch (error) {
+      throw new Error(`读取运行中会话失败：${error.message}`)
+    }
   } else {
     const handle = await sp.open(id, 'read')
     try {
@@ -479,6 +486,7 @@ async function scanSession(sp, id, ctx) {
     preview,
     jobIds: [...jobIds],
     lastSeq: lastAt,
+    liveSeq,
   }
 }
 
@@ -628,6 +636,24 @@ function createDashboard(ctx, router, configState = {}) {
     }
   }
 
+  async function refreshLive(sp, sessions) {
+    const now = Date.now()
+    for (const session of sessions) {
+      if (!session.live) continue
+      const live = ctx.get('sessions')?.get?.(session.id)
+      const seq = typeof live?.seq === 'number' ? live.seq : undefined
+      const cached = cache[session.id]
+      if (cached && cached.v === CACHE_VERSION && cached.liveSeq === seq && cached.stats && now - (cached.at || 0) < 1500) continue
+      try {
+        const stats = await scanSession(sp, session.id, ctx)
+        cache[session.id] = { v: CACHE_VERSION, liveSeq: seq, at: Date.now(), stats }
+      } catch (error) {
+        cache[session.id] = { v: CACHE_VERSION, liveSeq: seq, at: Date.now(), error: error.message }
+      }
+      saveCache()
+    }
+  }
+
   async function configPayload() {
     const tiers = {}
     for (const tier of ['deep', 'standard', 'cheap']) tiers[tier] = describeTier(router.config.tiers[tier])
@@ -711,6 +737,7 @@ function createDashboard(ctx, router, configState = {}) {
       }
     } catch {}
     sessions = sessions.map((session) => ({ ...session, live: liveIds.has(session.id) }))
+    await refreshLive(sp, sessions)
 
     const jobsBySession = new Map()
     for (const job of router.jobs.values()) {

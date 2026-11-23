@@ -201,10 +201,7 @@ window.__ModuleLoader__.load({
                 segment.firstTurn !== undefined && segment.firstTurn !== null
                   ? `第 ${segment.firstTurn + 1}–${segment.lastTurn + 1} 轮 · ${segment.turns} 次`
                   : `${segment.turns} 次`))))
-            : h('div', { className: 'tr-empty' },
-              item.stats
-                ? (item.live ? '当前对话还在写，结束后再统计时间线' : '没有模型参与记录')
-                : '正在读取会话日志…'),
+            : h('div', { className: 'tr-empty' }, item.stats ? '没有模型参与记录' : '正在读取会话日志…'),
           item.stats && item.stats.timelineTruncated ? h('div', { className: 'tr-hint' }, '只显示前 40 段') : null),
 
         h('div', null,
