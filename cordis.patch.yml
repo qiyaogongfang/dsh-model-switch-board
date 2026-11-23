@@ -1,0 +1,4 @@
+# 任务路由：后台队列 + 分层模型。没有浏览器半边，只注册工具和系统提示段落。
+- insert:
+    - id: task-router
+      name: '@local/task-router'

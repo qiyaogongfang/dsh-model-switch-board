@@ -1,0 +1,27 @@
+{
+  "name": "@local/task-router",
+  "version": "0.2.1",
+  "description": "把简单/中等的文本任务交给本机模型或免费池，后台跑完再取摘要，主对话不背原文。/ Route plain text work to local or free models in the background.",
+  "type": "module",
+  "main": "index.js",
+  "private": true,
+  "license": "MIT",
+  "keywords": ["dsh", "dsh-plugin", "deepseek-harness", "task-router", "background", "local-llm"],
+  "engines": {
+    "dsh": ">=0.2.2-rc.1"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": []
+    }
+  }
+}
