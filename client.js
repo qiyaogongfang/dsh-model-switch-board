@@ -13,7 +13,7 @@ window.__ModuleLoader__.load({
     const CONFIG_API = '/tr/api/config'
 
     const CSS = `
-.tr-root { display: flex; flex-direction: column; gap: 16px; padding: 20px 24px 40px; max-width: 1180px; margin: 0 auto; color: var(--dsw-alias-label-primary); }
+.tr-root { display: flex; flex-direction: column; gap: 16px; padding: 20px 24px 40px; max-width: 1180px; margin: 0 auto; height: 100%; box-sizing: border-box; overflow-y: auto; color: var(--dsw-alias-label-primary); }
 .tr-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .tr-title { margin: 0; font-size: 20px; font-weight: 650; letter-spacing: 0.2px; }
 .tr-sub { margin: 4px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--dsw-alias-label-secondary); }
@@ -55,7 +55,7 @@ window.__ModuleLoader__.load({
 .tr-tokens { text-align: right; font-variant-numeric: tabular-nums; color: var(--dsw-alias-label-secondary); }
 .tr-detail { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 12px;
   border: 1px solid var(--dsw-alias-border-l1); background: var(--dsw-alias-bg-base); }
-.tr-detail-row { padding: 12px 14px 14px; border-top: 1px solid var(--dsw-alias-border-l1); background: var(--dsw-alias-bg-layer-1); }
+.tr-detail-row { padding: 12px 14px 14px; border-top: 1px solid var(--dsw-alias-border-l1); background: var(--dsw-alias-bg-layer-1); max-height: 70vh; overflow-y: auto; }
 .tr-detail-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .tr-detail-title { font-size: 14px; font-weight: 620; }
 .tr-detail-sub { font-size: 11.5px; color: var(--dsw-alias-label-secondary); }
@@ -173,36 +173,28 @@ window.__ModuleLoader__.load({
               : '正在统计会话…')),
 
         h('div', null,
-          h('div', { className: 'tr-block-title' }, '模型明细'),
+          h('div', { className: 'tr-block-title' }, '模型 token 消耗'),
           item.stats && item.stats.models.length
             ? h('table', { className: 'tr-dtable' },
               h('thead', null, h('tr', null,
                 h('th', null, '提供方 / 模型'), h('th', null, '类型'), h('th', { className: 'num' }, '轮次'),
-                h('th', { className: 'num' }, '输入'), h('th', { className: 'num' }, '输出'))),
-              h('tbody', null, item.stats.models.map((model) => h('tr', { key: `${model.provider}/${model.model}` },
-                h('td', null, `${model.provider}/${model.model}`),
-                h('td', null, model.local ? '本机' : 'API'),
-                h('td', { className: 'num' }, fmt(model.turns)),
-                h('td', { className: 'num' }, fmt(model.input)),
-                h('td', { className: 'num' }, fmt(model.output))))))
+                h('th', { className: 'num' }, '输入'), h('th', { className: 'num' }, '输出'), h('th', { className: 'num' }, '合计'))),
+              h('tbody', null,
+                [...item.stats.models].sort((a, b) => (b.input + b.output) - (a.input + a.output)).map((model) => h('tr', { key: `${model.provider}/${model.model}` },
+                  h('td', null, `${model.provider}/${model.model}`),
+                  h('td', null, model.local ? '本机' : 'API'),
+                  h('td', { className: 'num' }, fmt(model.turns)),
+                  h('td', { className: 'num' }, fmt(model.input)),
+                  h('td', { className: 'num' }, fmt(model.output)),
+                  h('td', { className: 'num' }, fmt(model.input + model.output)))),
+                h('tr', null,
+                  h('td', null, '合计'),
+                  h('td', null, ''),
+                  h('td', { className: 'num' }, fmt(item.stats.turns)),
+                  h('td', { className: 'num' }, fmt(item.stats.input)),
+                  h('td', { className: 'num' }, fmt(item.stats.output)),
+                  h('td', { className: 'num' }, fmt(item.stats.input + item.stats.output)))))
             : h('div', { className: 'tr-empty' }, item.stats ? '这个对话没有模型回调记录' : '正在读取会话日志…')),
-
-        h('div', null,
-          h('div', { className: 'tr-block-title' }, '模型参与时间线'),
-          item.stats && item.stats.timeline && item.stats.timeline.length
-            ? h('div', { className: 'tr-timeline' }, item.stats.timeline.map((segment, index) => h('div', {
-              key: `${index}-${segment.key}`,
-              className: 'tr-seg',
-            },
-              h('span', { className: `tr-dot ${segment.local ? 'local' : ''}` }),
-              h('span', { className: 'tr-seg-model', title: `${segment.provider}/${segment.model}` }, segment.model || segment.provider),
-              h('span', { className: 'tr-seg-tag' }, segment.local ? '本机' : 'API'),
-              h('span', { className: 'tr-seg-range' },
-                segment.firstTurn !== undefined && segment.firstTurn !== null
-                  ? `第 ${segment.firstTurn + 1}–${segment.lastTurn + 1} 轮 · ${segment.turns} 次`
-                  : `${segment.turns} 次`))))
-            : h('div', { className: 'tr-empty' }, item.stats ? '没有模型参与记录' : '正在读取会话日志…'),
-          item.stats && item.stats.timelineTruncated ? h('div', { className: 'tr-hint' }, '只显示前 40 段') : null),
 
         h('div', null,
           h('div', { className: 'tr-block-title' }, `后台任务（${jobs.length}）`),
